@@ -14,22 +14,23 @@ module.exports = (function (options) { // define the template engine
 
   this.render = (filePath, locals, callback) => {
     const compile = (err, content) => {
+      locals.partials = locals.partials || {}
       var localKeys = Object.keys(locals)
       var localValues = localKeys.map(k => locals[k])
-      var partialKeys = Object.keys(locals.partials || {})
+      var partialKeys = Object.keys(locals.partialPaths || {})
       if (err) {
         return callback(new Error(err))
       }
-      if (partialKeys.length && !locals.partials.__rendered__) {
+      if (partialKeys.length) {
         // read all partials
-        return Promise.all(partialKeys.map(k => readPartial(locals.partials[k])))
+        return Promise.all(partialKeys.map(k => readPartial(locals.partialPaths[k])))
           .then(partialValues => {
             // render the partials
             partialKeys.forEach((k, index) => {
               locals.partials[k] = interpolate(partialValues[index], localKeys, localValues)
             })
             // mark as rendered
-            locals.partials.__rendered__ = true
+            locals.partials = true
             // render the template
             return callback(null, interpolate(content, localKeys, localValues))
           })
