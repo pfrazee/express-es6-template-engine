@@ -17,14 +17,11 @@ module.exports = (function (options) { // define the template engine
       var localKeys = Object.keys(locals)
       var localValues = localKeys.map(k => locals[k])
       var partialKeys = Object.keys(locals.partials || {})
-      // var keyList = localKeys.concat(partialKeys)
       if (err) {
         return callback(new Error(err))
       }
       if (partialKeys.length && !locals.partials.__rendered__) {
         // read all partials
-        console.log('all partials:',locals.partials)
-        console.log('partialkeys:', partialKeys)
         return Promise.all(partialKeys.map(k => readPartial(locals.partials[k])))
           .then(partialValues => {
             // render the partials
